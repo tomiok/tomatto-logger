@@ -10,13 +10,19 @@ import (
 )
 
 type Tomatto struct {
-	infoLogger *log.Logger
+	infoLogger    *log.Logger
+	warningLogger *log.Logger
+	errorLogger   *log.Logger
 }
 
 func NewTomatto() *Tomatto {
 	infoLogger := log.New(os.Stdout, "", 0)
+	warningLogger := log.New(os.Stdout, "", 0)
+	errorLogger := log.New(os.Stdout, "", 0)
 	return &Tomatto{
-		infoLogger: infoLogger,
+		infoLogger:    infoLogger,
+		warningLogger: warningLogger,
+		errorLogger:   errorLogger,
 	}
 }
 
