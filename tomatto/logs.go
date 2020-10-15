@@ -9,34 +9,24 @@ import (
 	"runtime"
 )
 
-type iLog struct {
-	logInfo   *log.Logger
-	logWarn   *log.Logger
-	logErr    *log.Logger
-	logString string
-}
+var _t tomatto
 
 type tomatto struct {
-	infoLogger    *log.Logger
-	warningLogger *log.Logger
-	errorLogger   *log.Logger
+	logInfo *log.Logger
+	logWarn *log.Logger
+	logErr  *log.Logger
 }
 
-func NewTomatto() *iLog {
-	// clean ILog date using setFlag(0)
+func NewTomatto() {
+	// clean tomatto date using setFlag(0)
 	log.SetFlags(0)
 	infoLogger := log.New(os.Stdout, "", 0)
 	warningLogger := log.New(os.Stdout, "", 0)
 	errorLogger := log.New(os.Stdout, "", 0)
-	t := &tomatto{
-		infoLogger:    infoLogger,
-		warningLogger: warningLogger,
-		errorLogger:   errorLogger,
-	}
-	return &iLog{
-		logInfo: t.infoLogger,
-		logWarn: t.warningLogger,
-		logErr:  t.errorLogger,
+	_t = &tomatto{
+		logInfo: infoLogger,
+		logWarn: warningLogger,
+		logErr:  errorLogger,
 	}
 }
 
@@ -51,10 +41,7 @@ func Info(message interface{}) {
 	}
 
 	b, _ := json.MarshalIndent(msg, "", "    ")
-	l := &iLog{
-		logString: string(b),
-	}
-	log.Print(l.logString)
+	_t.infoLogger.Print(l.logString)
 }
 
 func getStackTrace() (uintptr, string, int, error) {
