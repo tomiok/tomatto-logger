@@ -9,7 +9,7 @@ import (
 	"runtime"
 )
 
-var _t tomatto
+var _t *tomatto
 
 type tomatto struct {
 	logInfo *log.Logger
@@ -39,9 +39,8 @@ func Info(message interface{}) {
 		File:    path.Base(file),
 		Message: message,
 	}
-
 	b, _ := json.MarshalIndent(msg, "", "    ")
-	_t.infoLogger.Print(l.logString)
+	_t.logInfo.Print(string(b))
 }
 
 func getStackTrace() (uintptr, string, int, error) {
