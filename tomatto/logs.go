@@ -17,6 +17,7 @@ type tomatto struct {
 	logErr  *log.Logger
 }
 
+//NewTomatto use it at the beginning of the main function
 func NewTomatto() {
 	// clean tomatto date using setFlag(0)
 	log.SetFlags(0)
@@ -31,20 +32,25 @@ func NewTomatto() {
 }
 
 func Info(message interface{}) {
-	pc, file, line, _ := getStackTrace()
-
-	msg := &MsgTomatto{
-		Line:    line,
-		Method:  runtime.FuncForPC(pc).Name(),
-		File:    path.Base(file),
-		Message: message,
-	}
+	msg := newTomatto(getStackTrace, message)
 	b, _ := json.MarshalIndent(msg, "", "  ")
 	_t.logInfo.Print(string(b))
 }
 
+func Err(message interface{}) {
+	msg := newTomatto(getStackTrace, message)
+	b, _ := json.MarshalIndent(msg, "", "  ")
+	_t.logWarn.Print(string(b))
+}
+
+func Warn(message interface{}) {
+	msg := newTomatto(getStackTrace, message)
+	b, _ := json.MarshalIndent(msg, "", "  ")
+	_t.logWarn.Print(string(b))
+}
+
 func getStackTrace() (uintptr, string, int, error) {
-	pc, file, line, ok := runtime.Caller(2)
+	pc, file, line, ok := runtime.Caller(3)
 
 	if !ok {
 		return 0, "", 0, errors.New("cannot get stack trace")
@@ -53,12 +59,30 @@ func getStackTrace() (uintptr, string, int, error) {
 	return pc, file, line, nil
 }
 
+//MsgTomatto is the base structure for the JSON marshalled, contains all the info
+//necessary to build the correct and easy-to-read log.
+//File: is the file where the log is called.
+//Function: is the name like {package}.{function}
+//Message: the actual message to be logged.
 type MsgTomatto struct {
-	Line    int         `json:"line"`
-	Method  string      `json:"method"`
-	File    string      `json:"file"`
-	Message interface{} `json:"message,omitempty"`
-	Err     interface{} `json:"error,omitempty"`
-	Warn    interface{} `json:"warn,omitempty"`
+	File     string      `json:"file"`
+	Function string      `json:"function"`
+	Line     int         `json:"line"`
+	Message  interface{} `json:"message,omitempty"`
 	// fatal is out of scope
+}
+
+func newTomatto(fn func() (uintptr, string, int, error), message interface{}) *MsgTomatto {
+	pc, file, line, err := fn()
+
+	if err != nil {
+		return nil
+	}
+
+	return &MsgTomatto{
+		Line:     line,
+		Function: runtime.FuncForPC(pc).Name(),
+		File:     path.Base(file),
+		Message:  message,
+	}
 }
