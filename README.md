@@ -4,6 +4,16 @@ Tomatto logger is a lightweight library written 100 in Golang for standard outpu
 ## Usage
 Refer to [info_examples.go](./examples/info_example.go) file, you'll find a simple use there.
 
+## Output example
+```json
+{
+    "line": 19,
+    "method": "main.sum",
+    "file": "info_example.go",
+    "message": "the result is 1148"
+}
+```
+
 ## Built With
 * [Golang](https://golang.org/)- Go is an open source programming language that makes it easy to build simple, reliable, and efficient software. 
 
