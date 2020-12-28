@@ -22,7 +22,7 @@ func NewTomatto() {
 	log.SetFlags(0)
 	infoLogger := log.New(os.Stdout, "", 0)
 	warningLogger := log.New(os.Stdout, "", 0)
-	errorLogger := log.New(os.Stdout, "", 0)
+	errorLogger := log.New(os.Stderr, "", 0)
 	_t = &tomatto{
 		logInfo: infoLogger,
 		logWarn: warningLogger,
@@ -39,7 +39,7 @@ func Info(message interface{}) {
 		File:    path.Base(file),
 		Message: message,
 	}
-	b, _ := json.MarshalIndent(msg, "", "    ")
+	b, _ := json.MarshalIndent(msg, "", "  ")
 	_t.logInfo.Print(string(b))
 }
 

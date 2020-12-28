@@ -9,6 +9,9 @@ func main() {
 	tomatto.NewTomatto()
 
 	sum(165, 983)
+
+	tomatto.Test("hello %s %d", "tomas", 1)
+
 }
 
 func sum(a, b int) int {

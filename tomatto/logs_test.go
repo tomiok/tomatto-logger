@@ -4,5 +4,5 @@ import "testing"
 
 func Test_infoLogger(t *testing.T) {
 	NewTomatto()
-	Info("hola esto es una prueba del streaming")
+	Info("hello this is a test")
 }
