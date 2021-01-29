@@ -3,6 +3,7 @@ package tomatto
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"os"
 	"path"
@@ -49,6 +50,31 @@ func Warn(message interface{}) {
 	_t.logWarn.Print(string(b))
 }
 
+//
+// formatted
+//
+
+func Infof(s string, values ...interface{}) {
+	formatted := fmt.Sprintf(s, values...)
+	msg := newTomatto(getStackTrace, formatted)
+	b, _ := json.MarshalIndent(msg, "", "	")
+	_t.logInfo.Print(string(b))
+}
+
+func Errorf(s string, values ...interface{}) {
+	formatted := fmt.Sprintf(s, values...)
+	msg := newTomatto(getStackTrace, formatted)
+	b, _ := json.MarshalIndent(msg, "", "	")
+	_t.logErr.Print(string(b))
+}
+
+func Warnf(s string, values ...interface{}) {
+	formatted := fmt.Sprintf(s, values...)
+	msg := newTomatto(getStackTrace, formatted)
+	b, _ := json.MarshalIndent(msg, "", "	")
+	_t.logWarn.Print(string(b))
+}
+
 func getStackTrace() (uintptr, string, int, error) {
 	pc, file, line, ok := runtime.Caller(3)
 
@@ -73,11 +99,7 @@ type MsgTomatto struct {
 }
 
 func newTomatto(fn func() (uintptr, string, int, error), message interface{}) *MsgTomatto {
-	pc, file, line, err := fn()
-
-	if err != nil {
-		return nil
-	}
+	pc, file, line, _ := fn()
 
 	return &MsgTomatto{
 		Line:     line,

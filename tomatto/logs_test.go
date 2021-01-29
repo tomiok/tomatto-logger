@@ -16,3 +16,8 @@ func Test_errLogger(t *testing.T) {
 	NewTomatto()
 	Err("if you can read this, is working")
 }
+
+func Test_formattedInfo(t *testing.T) {
+	NewTomatto()
+	Infof("if you can read %s, is %s. And this is a number: %d", "this", "working", 150)
+}
