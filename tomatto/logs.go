@@ -20,6 +20,23 @@ type tomatto struct {
 	debug   bool
 }
 
+//MsgTomatto is the base structure for the JSON marshalled, contains all the info
+//necessary to build the correct and easy-to-read log.
+//File: is the file where the log is called.
+//Function: is the name like {package}.{function}
+//Message: the actual message to be logged.
+type MsgTomatto struct {
+	File     string      `json:"file,omitempty"`
+	Function string      `json:"function,omitempty"`
+	Line     int         `json:"line"`
+	Message  interface{} `json:"message,omitempty"`
+	// fatal is out of scope
+}
+
+type RequestEntry struct {
+	Request string `json:"request"`
+}
+
 func (t *tomatto) marshall(msg interface{}) []byte {
 	if t.pretty {
 		b, _ := json.MarshalIndent(msg, "", "  ")
@@ -58,7 +75,7 @@ func Error(message interface{}) {
 }
 
 func ErrorS(message string, err error) {
-	msg := newTomatto(getStackTrace, message+err.Error(), _t.debug)
+	msg := newTomatto(getStackTrace, message+" "+err.Error(), _t.debug)
 	b := _t.marshall(msg)
 	_t.logErr.Print(string(b))
 }
@@ -94,6 +111,16 @@ func Warnf(s string, values ...interface{}) {
 	_t.logWarn.Print(string(b))
 }
 
+//
+// file not shown, for repetitive log entries
+//
+
+func LogRequest(s string) {
+	msg := newTomatto(getStackTrace, s, _t.debug)
+	b := _t.marshall(msg.requestEntry())
+	_t.logInfo.Print(string(b))
+}
+
 func getStackTrace() (uintptr, string, int, error) {
 	pc, file, line, ok := runtime.Caller(3)
 
@@ -102,19 +129,6 @@ func getStackTrace() (uintptr, string, int, error) {
 	}
 
 	return pc, file, line, nil
-}
-
-//MsgTomatto is the base structure for the JSON marshalled, contains all the info
-//necessary to build the correct and easy-to-read log.
-//File: is the file where the log is called.
-//Function: is the name like {package}.{function}
-//Message: the actual message to be logged.
-type MsgTomatto struct {
-	File     string      `json:"file"`
-	Function string      `json:"function,omitempty"`
-	Line     int         `json:"line"`
-	Message  interface{} `json:"message,omitempty"`
-	// fatal is out of scope
 }
 
 func newTomatto(fn func() (uintptr, string, int, error), s interface{}, debug bool) *MsgTomatto {
@@ -129,5 +143,11 @@ func newTomatto(fn func() (uintptr, string, int, error), s interface{}, debug bo
 		Function: funcCall,
 		File:     path.Base(file),
 		Message:  s,
+	}
+}
+
+func (msg *MsgTomatto) requestEntry() *RequestEntry {
+	return &RequestEntry{
+		Request: msg.Message.(string),
 	}
 }

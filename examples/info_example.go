@@ -6,7 +6,7 @@ import (
 )
 
 func main() {
-	tomatto.NewTomatto()
+	tomatto.NewTomatto(false, false)
 
 	sum(165, 983)
 

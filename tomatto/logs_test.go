@@ -29,3 +29,8 @@ func Test_formattedErr(t *testing.T) {
 	NewTomatto(true, true)
 	ErrorS("if you can read ", errors.New("is working"))
 }
+
+func Test_logRequest(t *testing.T) {
+	NewTomatto(false, false)
+	LogRequest("some request in path /users")
+}
